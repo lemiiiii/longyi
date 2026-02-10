@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐉 龙姐牛逼永动机 | Dragon Sister NB Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        @keyframes scroll-right {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        .animate-scroll-left {
+            animation: scroll-left var(--speed, 15s) linear infinite;
+        }
+        .animate-scroll-right {
+            animation: scroll-right var(--speed, 20s) linear infinite;
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        .animate-rainbow {
+            animation: rainbow 3s linear infinite;
+        }
+        .text-glow {
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .stripe {
+            white-space: nowrap;
+            will-change: transform;
+        }
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-white overflow-hidden h-screen relative">
+
+    <!-- 动态背景网格 -->
+    <div class="fixed inset-0 opacity-20 pointer-events-none">
+        <div class="absolute inset-0" style="background-image: linear-gradient(rgba(245,158,11,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
+    </div>
+
+    <!-- 中央大标题 -->
+    <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 text-center pointer-events-none">
+        <div class="animate-float">
+            <h1 class="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-500 to-purple-600 text-glow animate-rainbow" style="font-family: 'Noto Sans SC', sans-serif;">
+                龙姐牛逼
+            </h1>
+            <div class="mt-4 flex justify-center gap-2 text-4xl md:text-6xl animate-pulse">
+                <span>🐉</span><span>👑</span><span>✨</span><span>🔥</span><span>💎</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 滚动条容器 -->
+    <div id="stripes-container" class="absolute inset-0 flex flex-col justify-center gap-4 md:gap-6 py-20">
+        <!-- 这里会由JS生成20+条滚动条 -->
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center gap-4 w-full max-w-2xl px-4">
+        
+        <!-- 速度控制 -->
+        <div class="glass rounded-2xl px-6 py-3 flex items-center gap-4 shadow-2xl shadow-amber-500/20">
+            <span class="text-sm font-bold text-amber-400">🐢</span>
+            <input type="range" id="speedControl" min="1" max="50" value="15" class="w-48 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" oninput="updateSpeed(this.value)">
+            <span class="text-sm font-bold text-amber-400">🚀</span>
+            <span id="speedDisplay" class="text-xs font-mono text-slate-400 w-12 text-right">15s</span>
+        </div>
+
+        <!-- 按钮组 -->
+        <div class="flex gap-3 flex-wrap justify-center">
+            <button onclick="addStripe()" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-amber-500/30 flex items-center gap-2">
+                <span>➕</span> 加一条
+            </button>
+            <button onclick="toggleDirection()" class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-purple-500/30 flex items-center gap-2">
+                <span>🔄</span> 换方向
+            </button>
+            <button onclick="randomizeColors()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-white font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-blue-500/30 flex items-center gap-2">
+                <span>🎨</span> 换颜色
+            </button>
+            <button onclick="generateShareLink()" class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-green-500/30 flex items-center gap-2">
+                <span>🔗</span> 分享链接
+            </button>
+        </div>
+
+        <!-- 分享链接显示区 -->
+        <div id="shareArea" class="hidden w-full glass rounded-xl p-4 text-center">
+            <div class="text-xs text-slate-400 mb-2">复制下方链接分享给好友一起赞美龙姐：</div>
+            <div class="flex gap-2">
+                <input type="text" id="shareLink" readonly class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-amber-400 font-mono select-all">
+                <button onclick="copyLink()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-sm transition-colors">
+                    复制
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 粒子背景 -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden" id="particles"></div>
+
+    <script>
+        // 赞美词库
+        const praises = [
+            "牛逼啊龙姐", "龙姐牛逼啊", "牛逼啊", "牛逼！", 
+            "🐉 龙姐永远滴神", "👑 龙姐YYDS", "✨ 龙姐太强了",
+            "🔥 龙姐无敌", "💎 龙姐霸气", "🚀 龙姐起飞",
+            "龙姐666", "龙姐yyds", "给龙姐跪了", "龙姐带飞",
+            "龙姐是我偶像", "龙姐天下第一", "龙姐永远的神",
+            "龙姐牛逼plus", "龙姐牛逼ProMax", "龙姐牛逼Ultra",
+            "龙姐🐮🍺", "龙姐💪💪💪", "龙姐🌟🌟🌟",
+            "龙姐yyds!!!", "龙姐nb", "龙姐太猛了", "龙姐yyds",
+            "龙姐就是神", "龙姐无敌了", "龙姐最强", "龙姐最棒"
+        ];
+
+        const colors = [
+            "text-amber-400", "text-pink-400", "text-purple-400", 
+            "text-blue-400", "text-green-400", "text-red-400",
+            "text-cyan-400", "text-orange-400", "text-lime-400",
+            "text-indigo-400", "text-rose-400", "text-teal-400"
+        ];
+
+        const bgColors = [
+            "bg-amber-500/10", "bg-pink-500/10", "bg-purple-500/10",
+            "bg-blue-500/10", "bg-green-500/10", "bg-red-500/10",
+            "bg-cyan-500/10", "bg-orange-500/10", "bg-lime-500/10"
+        ];
+
+        let stripeCount = 0;
+        let currentSpeed = 15;
+        let directionToggle = false;
+
+        // 初始化生成15条
+        function init() {
+            for(let i = 0; i < 15; i++) {
+                addStripe();
+            }
+            createParticles();
+        }
+
+        // 添加滚动条
+        function addStripe() {
+            const container = document.getElementById('stripes-container');
+            const stripe = document.createElement('div');
+            
+            const praise = praises[Math.floor(Math.random() * praises.length)];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const bgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+            const fontSize = Math.random() > 0.5 ? 'text-2xl md:text-4xl' : 'text-xl md:text-3xl';
+            const isLeft = Math.random() > 0.5;
+            const speed = (Math.random() * 20 + 10).toFixed(1);
+            
+            stripe.className = `stripe w-full ${bgColor} border-y border-white/5 py-2 md:py-3 overflow-hidden`;
+            stripe.style.setProperty('--speed', speed + 's');
+            
+            const content = Array(10).fill(`<span class="${fontSize} font-bold ${color} text-glow mx-4 md:mx-8 inline-block">${praise}</span>`).join('');
+            
+            stripe.innerHTML = `
+                <div class="${isLeft ? 'animate-scroll-left' : 'animate-scroll-right'} flex">
+                    ${content}${content}
+                </div>
+            `;
+            
+            // 随机旋转角度
+            const rotate = (Math.random() - 0.5) * 4;
+            stripe.style.transform = `rotate(${rotate}deg) scale(1.02)`;
+            
+            container.appendChild(stripe);
+            stripeCount++;
+            
+            // 限制最大条数防止卡顿
+            if(stripeCount > 25) {
+                container.removeChild(container.firstChild);
+                stripeCount--;
+            }
+        }
+
+        // 更新速度
+        function updateSpeed(val) {
+            currentSpeed = 51 - val; // 反转：值越大速度越快（时间越短）
+            document.getElementById('speedDisplay').textContent = currentSpeed.toFixed(1) + 's';
+            document.querySelectorAll('.stripe').forEach(stripe => {
+                const currentAnimation = stripe.querySelector('div');
+                const isLeft = currentAnimation.classList.contains('animate-scroll-left');
+                currentAnimation.style.animationDuration = currentSpeed + 's';
+            });
+        }
+
+        // 切换方向
+        function toggleDirection() {
+            directionToggle = !directionToggle;
+            document.querySelectorAll('.stripe').forEach(stripe => {
+                const div = stripe.querySelector('div');
+                if(div.classList.contains('animate-scroll-left')) {
+                    div.classList.remove('animate-scroll-left');
+                    div.classList.add('animate-scroll-right');
+                } else {
+                    div.classList.remove('animate-scroll-right');
+                    div.classList.add('animate-scroll-left');
+                }
+            });
+        }
+
+        // 随机换色
+        function randomizeColors() {
+            document.querySelectorAll('.stripe span').forEach(span => {
+                const newColor = colors[Math.floor(Math.random() * colors.length)];
+                span.className = span.className.replace(/text-\w+-400/, newColor);
+            });
+        }
+
+        // 生成分享链接
+        function generateShareLink() {
+            const baseUrl = window.location.href.split('?')[0];
+            const params = new URLSearchParams({
+                stripes: stripeCount,
+                speed: currentSpeed,
+                theme: 'dragon-sister-nb'
+            });
+            const shareUrl = baseUrl + '?' + params.toString();
+            
+            document.getElementById('shareLink').value = shareUrl;
+            document.getElementById('shareArea').classList.remove('hidden');
+        }
+
+        // 复制链接
+        function copyLink() {
+            const input = document.getElementById('shareLink');
+            input.select();
+            document.execCommand('copy');
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '已复制!';
+            btn.classList.add('bg-green-600');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('bg-green-600');
+            }, 2000);
+        }
+
+        // 创建背景粒子
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for(let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'absolute rounded-full animate-pulse';
+                particle.style.cssText = `
+                    width: ${Math.random() * 6 + 2}px;
+                    height: ${Math.random() * 6 + 2}px;
+                    background: ${['#f59e0b', '#ec4899', '#8b5cf6'][Math.floor(Math.random() * 3)]};
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation-duration: ${Math.random() * 3 + 2}s;
+                    animation-delay: ${Math.random() * 2}s;
+                    opacity: ${Math.random() * 0.5 + 0.2};
+                `;
+                container.appendChild(particle);
+            }
+        }
+
+        // 自动添加新条
+        setInterval(() => {
+            if(Math.random() > 0.7) addStripe();
+        }, 3000);
+
+        // 启动
+        init();
+    </script>
+</body>
+</html>
